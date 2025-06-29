@@ -1,2 +1,2 @@
-# test proj
-This is a test repository.
+# Prototype Obby
+Roblox Obby written in luau, development still in-progress.
