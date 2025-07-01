@@ -5,8 +5,5 @@ local CameraManager = require(script.Parent.Modules.CameraManager)
 CameraManager:Initialize()
 ReplicatedStorage.Events.DataLoaded.OnClientEvent:Connect(function(data)
 	print("Client Loaded. Data recieved from server: ", data)
-	ReplicatedStorage.Events.StartSpawn:FireServer()
+	RemoteEvents.StartSpawn:FireServer()
 end)
-
-
-

@@ -1,4 +1,3 @@
---!nocheck
 local fs = require("@lune/fs")
 local process = require("@lune/process")
 local roblox = require("@lune/roblox")
@@ -18,13 +17,13 @@ local SERVICE_LOOKUP = {
 
 local function getScriptExtension(instance)
     if instance.ClassName == "ModuleScript" then
-        return ".lua"
+        return ".luau"
     elseif instance.ClassName == "LocalScript" then
-        return ".client.lua"
+        return ".client.luau"
     elseif instance.ClassName == "Script" then
-        return ".server.lua"
+        return ".server.luau"
     else
-        return ".lua"
+        return ".luau"
     end
 end
 
@@ -71,7 +70,6 @@ for serviceName, folderName in pairs(SERVICE_LOOKUP) do
     if service then
         local servicePath = outputPath .. "/" .. folderName
         fs.writeDir(servicePath)
-        -- Save children of the service inside the mapped folder, not the service itself
         for _, child in ipairs(service:GetChildren()) do
             saveInstance(servicePath, child)
         end
