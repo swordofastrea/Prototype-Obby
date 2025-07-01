@@ -1,11 +1,11 @@
 # Prototype Obby
 Roblox Obby written in luau, development still in-progress.
 
-## Setup Tools:
+## Setup Tools
 * [Git](https://git-scm.com/downloads)
 * [Rokit](https://github.com/rojo-rbx/rokit)
 
-## Setup Guide:
+## Setup Guide
 Clone the repository
 ```bash
 git clone https://github.com/swordofastrea/Prototype-Obby.git
