@@ -1,3 +1,4 @@
+--!nocheck
 local fs = require("@lune/fs")
 local process = require("@lune/process")
 local roblox = require("@lune/roblox")
@@ -41,10 +42,6 @@ local function isFolderLike(instance)
     return folderLikeClasses[instance.ClassName] or false
 end
 
-local function isService(instance)
-    return SERVICE_LOOKUP[instance.Name] ~= nil
-end
-
 local function saveInstance(path, instance)
     if isFolderLike(instance) then
         local dirPath = path .. "/" .. instance.Name
@@ -61,9 +58,9 @@ local function saveInstance(path, instance)
         local filePath = path .. "/" .. instance.Name .. ext
         fs.writeFile(filePath, instance.Source)
     else
-        local modelData = roblox.serializeModel({ instance })
+        local miscPartData = roblox.serializeModel({ instance })
         local filePath = path .. "/" .. instance.Name .. ".rbxm"
-        fs.writeFile(filePath, modelData)
+        fs.writeFile(filePath, miscPartData)
     end
 end
 
