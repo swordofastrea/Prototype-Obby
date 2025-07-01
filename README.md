@@ -10,11 +10,8 @@ Clone the repository
 ```bash
 git clone https://github.com/swordofastrea/Prototype-Obby.git
 ```
-Install project tools
+Install project tools in cloned repo directory
 ```bash
 rokit install
 ```
 Setup complete! Now you just need to sync with Roblox Studio using Rojo.
-
-
-
