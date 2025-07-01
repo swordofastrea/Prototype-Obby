@@ -1,25 +1,3 @@
--- MIT License
-
--- Copyright (c) 2021 osyrisrblx
-
--- Permission is hereby granted, free of charge, to any person obtaining a copy
--- of this software and associated documentation files (the "Software"), to deal
--- in the Software without restriction, including without limitation the rights
--- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- copies of the Software, and to permit persons to whom the Software is
--- furnished to do so, subject to the following conditions:
-
--- The above copyright notice and this permission notice shall be included in all
--- copies or substantial portions of the Software.
-
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
--- SOFTWARE.
-
 local fs = require("@lune/fs")
 local process = require("@lune/process")
 local roblox = require("@lune/roblox")
@@ -31,43 +9,74 @@ assert(outputPath, "Output path is required")
 local placeInstance = roblox.deserializePlace(fs.readFile(placePath))
 
 local SERVICE_LOOKUP = {
-    "Workspace",
-    "ReplicatedStorage",
-    "ServerScriptService",
-    "StarterPlayer",
-    "Lighting",
+    ReplicatedStorage = "shared",
+    ServerScriptService = "server",
+    StarterPlayer = "client",
+    Workspace = "workspace",
 }
 
-fs.writeDir(outputPath)
-
-local function writeChildren(path, parent)
-    for _, child in ipairs(parent:GetChildren()) do
-        if child:IsA("Folder") or child:IsA("Model") or child:IsA("ScreenGui") or child:IsA("PluginGui") then
-            fs.writeDir(path .. "/" .. child.Name)
-            writeChildren(path .. "/" .. child.Name, child)
-        else
-            local model = roblox.serializeModel({child})
-            print("Writing " .. path .. "/" .. child.Name .. ".rbxm")
-            fs.writeFile(path .. "/" .. child.Name .. ".rbxm", model)
-        end
+local function getScriptExtension(instance)
+    if instance.ClassName == "ModuleScript" then
+        return ".lua"
+    elseif instance.ClassName == "LocalScript" then
+        return ".client.lua"
+    elseif instance.ClassName == "Script" then
+        return ".server.lua"
+    else
+        return ".lua"
     end
 end
 
-for _, serviceName in ipairs(SERVICE_LOOKUP) do
+local function isFolderLike(instance)
+    local folderLikeClasses = {
+        ["Folder"] = true,
+        ["StarterPlayer"] = true,
+        ["StarterPlayerScripts"] = true,
+        ["StarterCharacterScripts"] = true,
+        ["ReplicatedStorage"] = true,
+        ["ServerScriptService"] = true,
+        ["Workspace"] = true,
+    }
+
+    return folderLikeClasses[instance.ClassName] or false
+end
+
+local function isService(instance)
+    return SERVICE_LOOKUP[instance.Name] ~= nil
+end
+
+local function saveInstance(path, instance)
+    if isFolderLike(instance) then
+        local dirPath = path .. "/" .. instance.Name
+        fs.writeDir(dirPath)
+        for _, child in ipairs(instance:GetChildren()) do
+            saveInstance(dirPath, child)
+        end
+    elseif instance:IsA("Model") then
+        local modelData = roblox.serializeModel({ instance })
+        local filePath = path .. "/" .. instance.Name .. ".rbxm"
+        fs.writeFile(filePath, modelData)
+    elseif instance:IsA("LuaSourceContainer") then
+        local ext = getScriptExtension(instance)
+        local filePath = path .. "/" .. instance.Name .. ext
+        fs.writeFile(filePath, instance.Source)
+    else
+        local modelData = roblox.serializeModel({ instance })
+        local filePath = path .. "/" .. instance.Name .. ".rbxm"
+        fs.writeFile(filePath, modelData)
+    end
+end
+
+fs.writeDir(outputPath)
+
+for serviceName, folderName in pairs(SERVICE_LOOKUP) do
     local service = placeInstance:GetService(serviceName)
     if service then
-        local servicePath = outputPath .. "/" .. serviceName
+        local servicePath = outputPath .. "/" .. folderName
         fs.writeDir(servicePath)
-
-        if serviceName == "StarterPlayer" then
-            local starterPlayerScripts = service:FindFirstChild("StarterPlayerScripts")
-            if starterPlayerScripts then
-                local spsPath = servicePath .. "/StarterPlayerScripts"
-                fs.writeDir(spsPath)
-                writeChildren(spsPath, starterPlayerScripts)
-            end
-        else
-            writeChildren(servicePath, service)
+        -- Save children of the service inside the mapped folder, not the service itself
+        for _, child in ipairs(service:GetChildren()) do
+            saveInstance(servicePath, child)
         end
     end
 end

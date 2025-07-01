@@ -1,20 +1,45 @@
 {
-  "name": "random ahh obby",
-  "tree": {
-    "$className": "DataModel",
+	"name": "Prototype Obby",
+	"tree": {
+		"$className": "DataModel",
 
-    "ReplicatedStorage": {
-      "$path": "src/shared"
-    },
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"$path": "src/shared"
+		},
 
-    "ServerScriptService": {
-      "$path": "src/server"
-    },
+		"ServerScriptService": {
+			"$className": "ServerScriptService",
+			"$path": "src/server"
+		},
 
-    "StarterPlayer": {
-      "StarterPlayerScripts": {
-        "$path": "src/client"
-      }
-    }
-  }
+		"StarterPlayer": {
+			"$className": "StarterPlayer",
+			"StarterPlayerScripts": {
+				"$className": "StarterPlayerScripts",
+				"$path": "src/client/StarterPlayerScripts"
+			},
+			"StarterCharacterScripts": {
+				"$className": "StarterCharacterScripts",
+				"$path": "src/client/StarterCharacterScripts"
+			}
+		},
+
+		"Workspace": {
+			"$className": "Workspace",
+			"$path": "src/workspace"
+		},
+
+		"Lighting": {
+			"$className": "Lighting"
+		},
+
+		"SoundService": {
+			"$className": "SoundService",
+			"$properties": {
+				"RespectFilteringEnabled": true
+			}
+		}
+	}
 }
+
