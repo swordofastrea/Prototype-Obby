@@ -1,23 +1,25 @@
+--!strict
 local LeaderstatsManager = {}
-local Players = game:GetService("Players")
 local GameState = require(game:GetService("ReplicatedStorage").Modules.GameState)
 
-function LeaderstatsManager:Initialize()
-	game.Players.PlayerAdded:Connect(function(player)
-		
-		local leaderstats = Instance.new("Folder", player)
+function LeaderstatsManager.Initialize()
+	game.Players.PlayerAdded:Connect(function(player: Player)
+
+		local leaderstats = Instance.new("Folder")
+		leaderstats.Parent = player
 		leaderstats.Name = "leaderstats"
 
-		local stage = Instance.new("IntValue", leaderstats)
+		local stage = Instance.new("IntValue")
+		stage.Parent = leaderstats
 		stage.Name = "Stage"
 		stage.Value = 1
 	end)
 end
 
-function LeaderstatsManager:UpdateStage(player, stage)
-	local leaderstats = player:FindFirstChild("leaderstats")
+function LeaderstatsManager.UpdateStage(player: Player, stage: number)
+	local leaderstats = player:FindFirstChild("leaderstats") :: Folder
 	if leaderstats then
-		local stageStat = leaderstats:FindFirstChild("Stage")
+		local stageStat = GameState:GetStage(player)
 		if stageStat then
 			stageStat.Value = stage
 		end
@@ -25,4 +27,3 @@ function LeaderstatsManager:UpdateStage(player, stage)
 end
 
 return LeaderstatsManager
-
