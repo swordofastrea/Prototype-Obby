@@ -1,7 +1,7 @@
 --!strict
 local ProfileStore = require(game:GetService("ReplicatedStorage").Modules:WaitForChild("ProfileStore"))
 local Players = game:GetService("Players")
-local RemoteEvents = require(game:GetService("ReplicatedStorage").Modules.RemoteEvents)
+local ServerNetwork = require(game:GetService("ReplicatedStorage").Network.servernet)
 local LeaderstatsManager = require(script.Parent.LeaderstatsManager)
 local Kicker = require(game:GetService("ReplicatedStorage").Modules.Kicker)
 local DataManager = {}
@@ -37,9 +37,8 @@ function DataManager.LoadProfile(player: Player)
 		profile:AddUserId(player.UserId)
 		profile:Reconcile()
 		DataManager.UpdateData(player, "CurrentStage", profile.Data.CurrentStage)
-		RemoteEvents.DataLoaded:FireClient(player, profile.Data)
+		ServerNetwork.DataToClient.DataLoaded.fire(player, profile.Data.CurrentStage)
 		print("Loaded profile with data:", profile.Data.CurrentStage)
-		print("Data loaded for client successfully!")
 	else
 		Kicker.KickPlayer(player, "Your data was unable to load successfully. Please try rejoining.")
 	end
@@ -63,9 +62,9 @@ function DataManager.UpdateData(player: Player, key: string, value: number)
 	local profile = DataManager.GetProfile(player)
 	if profile then
 		profile.Data[key] = value
-		RemoteEvents.DataUpdate:FireClient(player, profile.Data)
 		if key == "CurrentStage" and player then
 			LeaderstatsManager.UpdateStage(player, value)
+			ServerNetwork.DataToClient.DataUpdate.fire(player, profile.Data.CurrentStage)
 		end
 	end
 end

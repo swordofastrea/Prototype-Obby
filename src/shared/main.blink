@@ -1,0 +1,30 @@
+option Casing = Camel
+option TypesOutput = "/Network/types.luau"
+option ClientOutput = "/Network/clientnet.luau"
+option ServerOutput = "/Network/servernet.luau"
+
+type player = Instance(Player)
+
+scope DataToClient {
+    type returnedData = u8
+    event DataUpdate {
+        from: Server,
+        type: Reliable,
+        call: SingleSync,
+        data: returnedData
+    }
+
+    event DataLoaded {
+        from: Server,
+        type: Reliable,
+        call: SingleSync,
+        data: returnedData
+    }
+}
+
+event StartSpawn {
+    from: Client,
+    type: Reliable,
+    call: ManySync,
+    data: player
+}
