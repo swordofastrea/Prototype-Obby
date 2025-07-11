@@ -51,7 +51,7 @@ local function saveInstance(path, instance)
         end
     elseif instance:IsA("Model") then
         local modelData = roblox.serializeModel({ instance })
-        local filePath = path .. "/" .. instance.Name .. ".rbxmx"
+        local filePath = path .. "/" .. instance.Name .. ".rbxm"
         fs.writeFile(filePath, modelData)
     elseif instance:IsA("LuaSourceContainer") then
         local ext = getScriptExtension(instance)
@@ -59,7 +59,7 @@ local function saveInstance(path, instance)
         fs.writeFile(filePath, instance.Source)
     else
         local miscPartData = roblox.serializeModel({ instance })
-        local filePath = path .. "/" .. instance.Name .. ".rbxmx"
+        local filePath = path .. "/" .. instance.Name .. ".rbxm"
         fs.writeFile(filePath, miscPartData)
     end
 end
