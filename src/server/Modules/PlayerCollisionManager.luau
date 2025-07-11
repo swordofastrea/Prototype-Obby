@@ -9,16 +9,16 @@ function PlayerCollisionManager.Initialize()
 
 	ServerNetwork.StartSpawn.on(function(player: Player)
 		if player.Character then
-			PlayerCollisionManager.disableCollisions(player)
+			PlayerCollisionManager.DisableCollisions(player)
 		end
 
 		player.CharacterAdded:Connect(function()
-			PlayerCollisionManager.disableCollisions(player)
+			PlayerCollisionManager.DisableCollisions(player)
 		end)
 	end)
 end
 
-function PlayerCollisionManager.disableCollisions(player: Player)
+function PlayerCollisionManager.DisableCollisions(player: Player)
     local character = player.Character
     for _, descendant in character:GetDescendants() do
         if descendant:IsA("BasePart") then
