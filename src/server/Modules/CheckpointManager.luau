@@ -1,7 +1,7 @@
 --!strict
 local CheckpointManager = {}
 local CollectionService = game:GetService("CollectionService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerNetwork = require(game:GetService("ReplicatedStorage").Network.servernet)
 local GameState = require(game:GetService("ReplicatedStorage").Modules.GameState)
 local DataManager = require(script.Parent.DataManager)
 local Players = game:GetService("Players")
@@ -31,23 +31,7 @@ function CheckpointManager.Initialize()
 			end
 		end
 
-	function CheckpointManager.teleportCharacter(player: Player)
-		local character = player.Character :: Model
-		if character then
-			local stageStat = GameState:GetStage(player)
-			if stageStat then
-				local checkpoint: BasePart = checkpoints[stageStat.Value]
-				if checkpoint then
-					local hrp = character:WaitForChild("HumanoidRootPart") :: BasePart
-					if hrp then
-						hrp.CFrame = checkpoint.CFrame + Vector3.new(0, 3, 0)
-					end
-				end
-			end
-		end
-	end
-
-	ReplicatedStorage.Events.StartSpawn.OnServerEvent:Connect(function(player: Player)
+	ServerNetwork.StartSpawn.on(function(player: Player)
 		if player.Character then
 			CheckpointManager.teleportCharacter(player)
 		end
@@ -56,6 +40,23 @@ function CheckpointManager.Initialize()
 			CheckpointManager.teleportCharacter(player)
 		end)
 	end)
+end
+
+function CheckpointManager.teleportCharacter(player: Player)
+	local character = player.Character :: Model
+	if character then
+		local stageStat = GameState:GetStage(player)
+		if stageStat then
+			local checkpoint: BasePart = checkpoints[stageStat.Value]
+			if checkpoint then
+				local hrp = character:WaitForChild("HumanoidRootPart") :: BasePart
+				if hrp then
+					local spawnOffset = Vector3.new(0, 3, 0)
+					hrp.CFrame = checkpoint.CFrame + spawnOffset
+				end
+			end
+		end
+	end
 end
 
 return CheckpointManager

@@ -1,11 +1,15 @@
 --!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RemoteEvents = require(ReplicatedStorage.Modules.RemoteEvents)
+local ClientNetwork = require(ReplicatedStorage.Network.clientnet)
+local Players = game:GetService("Players")
 local CameraManager = require(script.Parent.Modules.CameraManager)
 
 CameraManager.Initialize()
+ClientNetwork.DataToClient.DataLoaded.on(function(data: number)
+	print("Client loaded successfully. Current Stage: ", data)
+	ClientNetwork.StartSpawn.fire(Players.LocalPlayer)
+end)
 
-ReplicatedStorage.Events.DataLoaded.OnClientEvent:Connect(function(data: string)
-	print("Client Loaded. Data recieved from server: ", data)
-	RemoteEvents.StartSpawn:FireServer()
+ClientNetwork.DataToClient.DataUpdate.on(function(data: number)
+	print("Client data updated. Current Stage: ", data)
 end)
